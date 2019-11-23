@@ -9,12 +9,24 @@ class App extends React.Component {
   constructor() {
     super();
     // localStorage.removeItem('Boulder');
-    this.state = {city: 'Boulder', breweries: [], visitedList: JSON.parse(localStorage.getItem('Boulder'))};
+    this.state = {city: 'boulder', breweries: [], visitedList: (JSON.parse(localStorage.getItem('boulder')) || [])};
+    // if (!Array.isArray(this.state.visitedList)) {
+    //   this.state.visitedList = [];
+    //   localStorage.setItem('Boulder', JSON.stringify([]));
+    // }
+    console.log(this.state.visitedList);
+    $.get(`https://api.openbrewerydb.org/breweries?by_city=${this.state.city}`)
+    .then(breweries => this.setState({breweries}));
+  }
+
+  componentDidUpdate() {
     if (!Array.isArray(this.state.visitedList)) {
-      this.state.visitedList = [];
-      localStorage.setItem('Boulder', JSON.stringify([]));
+      this.setState({
+        visitedList: [],
+      });
+      localStorage.setItem(this.state.city, JSON.stringify([]));
     }
-    $.get('https://api.openbrewerydb.org/breweries?by_city=boulder')
+    $.get(`https://api.openbrewerydb.org/breweries?by_city=${this.state.city}`)
     .then(breweries => this.setState({breweries}));
   }
 
@@ -37,22 +49,26 @@ class App extends React.Component {
         }
       }
     }
-    localStorage.setItem('Boulder', JSON.stringify(visitedList));
+    localStorage.setItem(this.state.city, JSON.stringify(visitedList));
     this.setState({visitedList}, () => console.log('after state change', visitedList));
-    // const recurseIt = (node) => {
-    //   console.log(node);
-    //   node.style.background = "rgb(1,1,1)";
-    //   let children = node.children;
-    //   for (let child of children) {
-    //     recurseIt(child);
-    //   }
-    // }
-    // recurseIt(e.target);
+  }
+
+  handleSearch(e) {
+    e.preventDefault();
+    let city = document.getElementById('citySearch').value.toLowerCase();
+    this.setState({
+      city,
+      visitedList: (JSON.parse(localStorage.getItem(city)) || []),
+    })
   }
 
   render() {
     return (
       <div className="App container-fluid">
+        <form className="float-right" onSubmit={e => this.handleSearch(e)}>
+            <input id="citySearch" type="text" placeholder="Search By City"></input>
+            <input type="submit" value="submit"></input>
+        </form>
         <div className="App-header row justify-content-center">
             <img src={logo} className="App-logo align-self-center" alt="Brew Track Logo" />
             <div className="App-header-text align-self-center">BrewTrack -- Keep track of the breweries you've visited in Boulder!</div>
