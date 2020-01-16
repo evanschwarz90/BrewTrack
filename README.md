@@ -1,2 +1,5 @@
-NavBar and Product Details
-![Initial Open](./photos/IntialOpen.png)
+![Initial Open](./photos/initial-open.gif)
+
+![Change Cities](./photos/change-cities.gif)
+
+![Use Links](./photos/use-links.gif)
