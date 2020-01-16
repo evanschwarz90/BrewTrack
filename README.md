@@ -19,7 +19,7 @@ This is a one page app designed to help you keep track of the breweries you've v
    - Remembers which breweries you have checked off
    - Opens on default to the last city that you visited
 
-## Photos
+## Demos
 
 Demo of initial open of the page:
 
