@@ -3,36 +3,34 @@ import logo from './android-chrome-192x192.png';
 import './App.css';
 import $ from 'jquery';
 import BreweryCard from './breweryCard';
+import {promisify} from 'util';
 
 class App extends React.Component {
 
   constructor() {
     super();
     // localStorage.removeItem('Boulder');
-    this.state = {city: 'boulder', breweries: [], visitedList: (JSON.parse(localStorage.getItem('boulder')) || [])};
-    // if (!Array.isArray(this.state.visitedList)) {
-    //   this.state.visitedList = [];
-    //   localStorage.setItem('Boulder', JSON.stringify([]));
-    // }
-    console.log(this.state.visitedList);
-    $.get(`https://api.openbrewerydb.org/breweries?by_city=${this.state.city}`)
-    .then(breweries => this.setState({breweries}));
+    let city = localStorage.getItem('brewTrackLastCitySearched') || '';
+    // console.log('last city searched: ', city);
+    this.state = {city: '', breweries: [], visitedList: (JSON.parse(localStorage.getItem('')) || [])};
+    if (city !== '') {
+      this.handleSearch(false, city);
+    }
   }
 
-  componentDidUpdate() {
-    if (!Array.isArray(this.state.visitedList)) {
-      this.setState({
-        visitedList: [],
-      });
-      localStorage.setItem(this.state.city, JSON.stringify([]));
+  async pushBreweries(city, page = 1) {
+    let breweries = [];
+    const results = await $.get(`https://api.openbrewerydb.org/breweries?by_city=${city}&per_page=50&page=${page}`);
+    breweries = breweries.concat(results);
+    if (results.length === 50) {
+      let moreBreweries = await this.pushBreweries(city, page + 1);
+      breweries = breweries.concat(moreBreweries);
     }
-    $.get(`https://api.openbrewerydb.org/breweries?by_city=${this.state.city}`)
-    .then(breweries => this.setState({breweries}));
+    return breweries;
   }
 
   handleCardClick(e, id, breweryName) {
     e.preventDefault();
-    console.log('first check of state on click', this.state.visitedList);
     let visitedList = this.state.visitedList.slice();
     let className = document.getElementById(id).className;
     if (!className.includes('bg-success')) {
@@ -50,15 +48,27 @@ class App extends React.Component {
       }
     }
     localStorage.setItem(this.state.city, JSON.stringify(visitedList));
-    this.setState({visitedList}, () => console.log('after state change', visitedList));
+    this.setState({visitedList});
   }
 
-  handleSearch(e) {
-    e.preventDefault();
-    let city = document.getElementById('citySearch').value.toLowerCase();
+  async handleSearch(e, city) {
+    if (e) {
+      e.preventDefault();
+    }
+    // let google = window.google;
+    if (!city) {
+      city = document.getElementById('citySearch').value.toLowerCase();
+    }
+    localStorage.setItem('brewTrackLastCitySearched', city);
+    // console.log('new city: ', city);
+    let visitedList = (JSON.parse(localStorage.getItem(city)) || []);
+    // console.log('visited list: ', visitedList);
+    let breweries = await this.pushBreweries(city);
+    // console.log('breweries: ',breweries);
     this.setState({
       city,
-      visitedList: (JSON.parse(localStorage.getItem(city)) || []),
+      visitedList,
+      breweries,
     })
   }
 
@@ -71,29 +81,20 @@ class App extends React.Component {
         </form>
         <div className="App-header row justify-content-center">
             <img src={logo} className="App-logo align-self-center" alt="Brew Track Logo" />
-            <div className="App-header-text align-self-center">BrewTrack -- Keep track of the breweries you've visited in Boulder!</div>
+            <div className="App-header-text align-self-center">BrewTrack -- Keep track of the breweries you've visited in any city!</div>
         </div>
-        {/* <div className="App-body row"> */}
           <div className="Unvisited-breweries-section">
             <div className="card-deck">
               {this.state.breweries.map((brewery, i) => {
-                if (brewery.website_url !== '') {
-                  let visited = false;
-                  if (this.state.visitedList.includes(brewery.name)) {
-                    visited = true;
-                  }
-                  return (<BreweryCard breweryData={brewery} visited={visited} key={i} index={i} handleCardClick={this.handleCardClick.bind(this)} />)
+                let visited = false;
+                if (this.state.visitedList.includes(brewery.name)) {
+                  visited = true;
                 }
+                return (<BreweryCard breweryData={brewery} visited={visited} key={i} index={i} handleCardClick={this.handleCardClick.bind(this)} />)
               })}
             </div>
           </div>
-          {/* <div className="Brewery-checklist col-2">
-            {this.state.breweries.map((brewery, i) => (
-              <p>{brewery.name}</p>
-            ))}
-          </div> */}
         </div>
-      // </div>
     );
   }
 }

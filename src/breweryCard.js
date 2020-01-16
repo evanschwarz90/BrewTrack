@@ -28,7 +28,7 @@ class BreweryCard extends React.Component {
           <div className="card-footer">
             <a
               className="card-link float-left"
-              href={breweryData.website_url}
+              href={breweryData.website_url || null}
               onClick={e => e.stopPropagation()}
               target="_blank"
             >
