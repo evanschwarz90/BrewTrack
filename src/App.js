@@ -3,7 +3,6 @@ import logo from './android-chrome-192x192.png';
 import './App.css';
 import $ from 'jquery';
 import BreweryCard from './breweryCard';
-import {promisify} from 'util';
 
 class App extends React.Component {
 

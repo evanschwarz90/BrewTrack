@@ -1,6 +1,4 @@
 import React from 'react';
-import apiKey from './config';
-import $ from 'jquery';
 
 class BreweryCard extends React.Component {
   constructor(props) {
