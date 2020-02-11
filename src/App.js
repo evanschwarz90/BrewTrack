@@ -54,16 +54,12 @@ class App extends React.Component {
     if (e) {
       e.preventDefault();
     }
-    // let google = window.google;
     if (!city) {
       city = document.getElementById('citySearch').value.toLowerCase();
     }
     localStorage.setItem('brewTrackLastCitySearched', city);
-    // console.log('new city: ', city);
     let visitedList = (JSON.parse(localStorage.getItem(city)) || []);
-    // console.log('visited list: ', visitedList);
     let breweries = await this.pushBreweries(city);
-    // console.log('breweries: ',breweries);
     this.setState({
       city,
       visitedList,

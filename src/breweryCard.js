@@ -13,7 +13,6 @@ class BreweryCard extends React.Component {
     return (
       <div className="Brewery-card-box col-xl-3 col-lg-4 col-md-6 col-sm-12" onClick={e => this.props.handleCardClick(e,`breweryCard${index}`, breweryData.name)}>
         <div id={`breweryCard${index}`} className={visited ? "Brewery-card card bg-success" : "Brewery-card card"}>
-          {/* <img className="card-image" src="https://maps.googleapis.com/maps/api/place/photo?key=AIzaSyBfKXkvRdNh-hQHpq8CZhf2M7PDlfLUXQI&photoreference=CmRaAAAAhoYt7FPIYwNaLnAD8l7vkTvC2xhQOJzfelGMvN5zFSMpE5EV-KSdrs-ASOUCXCm9p4Beogumchky1FItQCbFgFtMGrsPdmwb7JrbaAObQc_kFuvO-X0w9WnC9ySyhfI1EhCTv_FeMvirbC8O3MDqqCgpGhTfEDLaxqEd7AQsMFqhc9pyUqvnEw" alt="upslope brewing" /> */}
           <div className="card-header Brewery-card-header">
             <h6 className="card-title">{breweryData.name}</h6>
           </div>
